@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Security.Cryptography.X509Certificates;
+﻿using System;
 
 public class Program
 {
@@ -14,15 +13,15 @@ public class Casino
 {
     public void Run()
     {
-        int balance = 100;
-        bool isRunning = true;
-
         Console.WriteLine( " ####     ##     ####   ######  #    #   #### " );
         Console.WriteLine( "#    #   #  #   #    #    ##    ##   #  #    #" );
         Console.WriteLine( "#       #    #  #         ##    # #  #  #    #" );
         Console.WriteLine( "#       ######   ####     ##    #  # #  #    #" );
         Console.WriteLine( "#    #  #    #       #    ##    #   ##  #    #" );
         Console.WriteLine( " ####   #    #  ####    ######  #    #   #### " );
+
+        int balance = RequestInitialBalance();
+        bool isRunning = true;
 
         while ( isRunning )
         {
@@ -47,6 +46,19 @@ public class Casino
                     break;
             }
         }
+    }
+
+    public int RequestInitialBalance()
+    {
+        Console.WriteLine( "Введите начальный баланс:" );
+        int balance;
+
+        while ( !int.TryParse( Console.ReadLine(), out balance ) || balance <= 0 )
+        {
+            Console.WriteLine( "Баланс должен быть целым числом больше нуля, попробуйте снова:" );
+        }
+
+        return balance;
     }
 
     public int PlayGame( int balance )

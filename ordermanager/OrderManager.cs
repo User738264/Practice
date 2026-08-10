@@ -29,7 +29,7 @@
         Console.WriteLine( $"{clientName}! Ваш заказ {productName} в количестве {count} оформлен! Ожидайте доставку по адресу {address} к {formattedDate}" );
     }
 
-    public string RequestNonEmptyString( string prompt )
+    private string RequestNonEmptyString( string prompt )
     {
         Console.Write( prompt );
         string? input = Console.ReadLine();
@@ -43,7 +43,7 @@
         return input;
     }
 
-    public int RequestPositiveInteger( string prompt )
+    private int RequestPositiveInteger( string prompt )
     {
         Console.Write( prompt );
         string? input = Console.ReadLine();
@@ -58,7 +58,7 @@
         return num;
     }
 
-    public bool IsOrderConfirmed( string clientName, int count, string productName, string address )
+    private bool IsOrderConfirmed( string clientName, int count, string productName, string address )
     {
         Console.WriteLine( $"Здравствуйте, {clientName}, вы заказали {count} {productName} на адрес {address}, все верно? (да/нет)" );
         string? confirmation = Console.ReadLine();

@@ -7,13 +7,13 @@ public class Casino
     private const int WinMultiplicator = 2;
     private const int FormulaModulus = 17;
 
-    private int balance;
+    private int _balance;
 
     public void Run()
     {
         PrintLogo();
 
-        balance = RequestInitialBalance();
+        _balance = RequestInitialBalance();
 
         while ( true )
         {
@@ -25,7 +25,7 @@ public class Casino
             switch ( Console.ReadLine() )
             {
                 case "1":
-                    Console.WriteLine( $"Ваш баланс: {balance}" );
+                    Console.WriteLine( $"Ваш баланс: {_balance}" );
                     break;
                 case "2":
                     PlayGame();
@@ -64,9 +64,9 @@ public class Casino
 
     private void PlayGame()
     {
-        Console.WriteLine( $"Введите ставку, от 1 до {balance}:" );
+        Console.WriteLine( $"Введите ставку, от 1 до {_balance}:" );
 
-        if ( !int.TryParse( Console.ReadLine(), out int bet ) || bet <= 0 || bet > balance )
+        if ( !int.TryParse( Console.ReadLine(), out int bet ) || bet <= 0 || bet > _balance )
         {
             Console.WriteLine( "Неверная ставка. Попробуйте снова." );
             return;
@@ -80,14 +80,14 @@ public class Casino
             // {bet} * (1 + ({multiplicator} * {random_num} % 17))
             int newBalance = bet * ( 1 + ( WinMultiplicator * randomNum % FormulaModulus ) );
             Console.WriteLine( $"Поздравляем! Вы выиграли! Ваш баланс был увеличен на {newBalance}" );
-            balance += newBalance;
-            Console.WriteLine( $"Ваш новый баланс: {balance}" );
+            _balance += newBalance;
+            Console.WriteLine( $"Ваш новый баланс: {_balance}" );
         }
         else
         {
             Console.WriteLine( $"К сожалению, вы проиграли. Ваш баланс был уменьшен на {bet}" );
-            balance -= bet;
-            Console.WriteLine( $"Ваш новый баланс: {balance}" );
+            _balance -= bet;
+            Console.WriteLine( $"Ваш новый баланс: {_balance}" );
         }
     }
 }

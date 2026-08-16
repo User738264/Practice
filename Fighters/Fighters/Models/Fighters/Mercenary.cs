@@ -1,18 +1,9 @@
-using Fighters.Models.Races;
-
 namespace Fighters.Models.Fighters
 {
-    public class Mercenary : FighterBase
+    public class Mercenary : IFighterClass
     {
-        public const int BonusDamage = 8;
-        public const int BonusHealth = 5;
-
-        protected override int ClassDamage => BonusDamage;
-
-        protected override int ClassHealth => BonusHealth;
-
-        public Mercenary( string name, IRace race ) : base( name, race )
-        {
-        }
+        public string Name => "Наемник";
+        public int BonusDamage => 8;
+        public int BonusHealth => 5;
     }
 }

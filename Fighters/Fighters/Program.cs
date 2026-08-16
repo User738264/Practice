@@ -155,9 +155,7 @@ namespace Fighters
 
             for ( int i = 0; i < arena.Count; i++ )
             {
-                IFighter fighter = arena[ i ];
-                Console.WriteLine(
-                    $"{i + 1}. {fighter.Name} — здоровье {fighter.GetMaxHealth()}, урон {fighter.CalculateDamage()}, броня {fighter.CalculateArmor()}, скорость {fighter.CalculateSpeed()}, крит {fighter.GetCritChance()} %" );
+                Console.WriteLine( $"{i + 1}. {arena[ i ]}" );
             }
         }
     }

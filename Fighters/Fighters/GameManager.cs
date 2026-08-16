@@ -1,4 +1,3 @@
-using Fighters.Extensions;
 using Fighters.Models.Fighters;
 
 namespace Fighters
@@ -14,7 +13,7 @@ namespace Fighters
 
         private const int MinDamagePerHit = 1;
 
-        private readonly Random Random = new();
+        private readonly Random _random = new();
 
         public IFighter Play( IReadOnlyList<IFighter> fighters )
         {
@@ -40,7 +39,7 @@ namespace Fighters
                         break;
                     }
 
-                    IFighter target = possibleTargets[ Random.Next( possibleTargets.Count ) ];
+                    IFighter target = possibleTargets[ _random.Next( possibleTargets.Count ) ];
 
                     int damage = CalculateDamageDealt( attacker, target, out bool isCritical );
                     target.TakeDamage( damage );
@@ -92,10 +91,10 @@ namespace Fighters
 
         private int CalculateDamageDealt( IFighter attacker, IFighter defender, out bool isCritical )
         {
-            double variance = MinDamageVariance + ( Random.NextDouble() * ( MaxDamageVariance - MinDamageVariance ) );
+            double variance = MinDamageVariance + ( _random.NextDouble() * ( MaxDamageVariance - MinDamageVariance ) );
             double damage = attacker.CalculateDamage() * ( 1 + variance );
 
-            isCritical = Random.NextDouble() < attacker.GetCritChance();
+            isCritical = _random.NextDouble() < attacker.GetCritChance();
             if ( isCritical )
             {
                 damage *= CriticalDamageMultiplier;
@@ -118,11 +117,11 @@ namespace Fighters
             if ( survivors.Count == 0 )
             {
                 Console.WriteLine( "Все бойцы пали одновременно — победитель определяется случайно" );
-                return fighters[ Random.Next( fighters.Count ) ];
+                return fighters[ _random.Next( fighters.Count ) ];
             }
 
             Console.WriteLine( "Битва слишком затянулась — победитель определяется случайно" );
-            IFighter winner = survivors[ Random.Next( survivors.Count ) ];
+            IFighter winner = survivors[ _random.Next( survivors.Count ) ];
             Console.WriteLine( $"По воле случая побеждает {winner.Name}!" );
             return winner;
         }

@@ -7,20 +7,50 @@ namespace Fighters.UI
 {
     public class FighterBuilder
     {
+        private static readonly IRace[] Races =
+        {
+            new Human(),
+            new Orc(),
+            new Elf(),
+            new Dwarf(),
+        };
+
+        private static readonly IFighterClass[] FighterClasses =
+        {
+            new Knight(),
+            new Mercenary(),
+            new Guardian(),
+            new Berserker(),
+        };
+
+        private static readonly IWeapon[] Weapons =
+        {
+            new Fists(),
+            new Dagger(),
+            new Sword(),
+            new Axe(),
+        };
+
+        private static readonly IArmor[] Armors =
+        {
+            new NoArmor(),
+            new SimpleClothes(),
+            new LeatherArmor(),
+            new ChainMail(),
+            new PlateArmor(),
+        };
+
         public IFighter Build( IReadOnlyCollection<string> takenNames )
         {
             Console.WriteLine( "Введите имя персонажа" );
             string name = ReadUniqueName( takenNames );
 
             IRace race = ChooseRace();
-            IFighter fighter = ChooseFighterClass( name, race );
-
+            IFighterClass fighterClass = ChooseFighterClass();
             IWeapon weapon = ChooseWeapon();
-            fighter.SetWeapon( weapon );
-
             IArmor armor = ChooseArmor();
-            fighter.SetArmor( armor );
 
+            IFighter fighter = new Fighter( name, race, fighterClass, weapon, armor );
             PrintSummary( fighter );
 
             return fighter;
@@ -43,9 +73,7 @@ namespace Fighters.UI
 
             for ( int i = 0; i < previews.Length; i++ )
             {
-                IFighter preview = previews[ i ];
-                Console.WriteLine(
-                    $"{i} - {preview.Name} (урон {preview.CalculateDamage()}, здоровье {preview.GetMaxHealth()}, броня {preview.CalculateArmor()}, скорость {preview.CalculateSpeed()}, крит {preview.GetCritChance()} %)" );
+                Console.WriteLine( $"{i} - {previews[ i ]}" );
             }
 
             int choice = ReadChoice( 0, previews.Length - 1 );
@@ -58,90 +86,66 @@ namespace Fighters.UI
 
         private IRace ChooseRace()
         {
-            IRace[] races =
-            {
-                new Human(),
-                new Orc(),
-                new Elf(),
-                new Dwarf(),
-            };
-
             Console.WriteLine( "Выберите расу из списка ниже" );
 
-            for ( int i = 0; i < races.Length; i++ )
+            for ( int i = 0; i < Races.Length; i++ )
             {
-                IRace race = races[ i ];
+                IRace race = Races[ i ];
                 Console.WriteLine(
                     $"{i} - {race.Name} (урон +{race.Damage}, здоровье +{race.Health}, броня +{race.Armor}, скорость +{race.Speed})" );
             }
 
-            int choice = ReadChoice( 0, races.Length - 1 );
-            return races[ choice ];
+            int choice = ReadChoice( 0, Races.Length - 1 );
+            return Races[ choice ];
         }
 
-        private IFighter ChooseFighterClass( string name, IRace race )
+        private IFighterClass ChooseFighterClass()
         {
             Console.WriteLine( "Выберите класс персонажа из списка ниже" );
-            Console.WriteLine( $"0 - Рыцарь (доп. урон +{Knight.BonusDamage}, доп. здоровье +{Knight.BonusHealth})" );
-            Console.WriteLine( $"1 - Наемник (доп. урон +{Mercenary.BonusDamage}, доп. здоровье +{Mercenary.BonusHealth})" );
-            Console.WriteLine( $"2 - Страж (доп. урон +{Guardian.BonusDamage}, доп. здоровье +{Guardian.BonusHealth})" );
-            Console.WriteLine( $"3 - Берсерк (доп. урон +{Berserker.BonusDamage}, доп. здоровье +{Berserker.BonusHealth})" );
 
-            int choice = ReadChoice( 0, 3 );
-
-            return choice switch
+            for ( int i = 0; i < FighterClasses.Length; i++ )
             {
-                0 => new Knight( name, race ),
-                1 => new Mercenary( name, race ),
-                2 => new Guardian( name, race ),
-                3 => new Berserker( name, race ),
-                _ => new Knight( name, race ),
-            };
+                IFighterClass fighterClass = FighterClasses[ i ];
+                Console.WriteLine(
+                    $"{i} - {fighterClass.Name} (доп. урон +{fighterClass.BonusDamage}, доп. здоровье +{fighterClass.BonusHealth})" );
+            }
+
+            int choice = ReadChoice( 0, FighterClasses.Length - 1 );
+
+            if ( choice < 0 || choice >= FighterClasses.Length )
+            {
+                throw new ArgumentOutOfRangeException( nameof( choice ), choice, "Некорректный выбор класса персонажа" );
+            }
+
+            return FighterClasses[ choice ];
         }
 
         private IWeapon ChooseWeapon()
         {
-            IWeapon[] weapons =
-            {
-                new Firsts(),
-                new Dagger(),
-                new Sword(),
-                new Axe(),
-            };
-
             Console.WriteLine( "Выберите оружие из списка ниже" );
 
-            for ( int i = 0; i < weapons.Length; i++ )
+            for ( int i = 0; i < Weapons.Length; i++ )
             {
-                IWeapon weapon = weapons[ i ];
+                IWeapon weapon = Weapons[ i ];
                 Console.WriteLine( $"{i} - {weapon.Name} (урон +{weapon.Damage}, шанс крита {weapon.CritChance} %)" );
             }
 
-            int choice = ReadChoice( 0, weapons.Length - 1 );
-            return weapons[ choice ];
+            int choice = ReadChoice( 0, Weapons.Length - 1 );
+            return Weapons[ choice ];
         }
 
         private IArmor ChooseArmor()
         {
-            IArmor[] armors =
-            {
-                new NoArmor(),
-                new SimpleClothes(),
-                new LeatherArmor(),
-                new ChainMail(),
-                new PlateArmor(),
-            };
-
             Console.WriteLine( "Выберите броню из списка ниже" );
 
-            for ( int i = 0; i < armors.Length; i++ )
+            for ( int i = 0; i < Armors.Length; i++ )
             {
-                IArmor armor = armors[ i ];
+                IArmor armor = Armors[ i ];
                 Console.WriteLine( $"{i} - {armor.Name} (броня +{armor.Armor}, штраф к скорости -{armor.SpeedPenalty})" );
             }
 
-            int choice = ReadChoice( 0, armors.Length - 1 );
-            return armors[ choice ];
+            int choice = ReadChoice( 0, Armors.Length - 1 );
+            return Armors[ choice ];
         }
 
         private void PrintSummary( IFighter fighter )

@@ -4,7 +4,6 @@ namespace Fighters.Models.Armors
     {
         public string Name { get; }
         public int Armor { get; }
-
         public int SpeedPenalty { get; }
     }
 }

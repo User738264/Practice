@@ -1,6 +1,3 @@
-using Fighters.Models.Armors;
-using Fighters.Models.Weapons;
-
 namespace Fighters.Models.Fighters
 {
     public interface IFighter
@@ -13,9 +10,7 @@ namespace Fighters.Models.Fighters
         public int CalculateArmor();
         public int CalculateSpeed();
         public double GetCritChance();
-
-        public void SetArmor( IArmor armor );
-        public void SetWeapon( IWeapon weapon );
+        public bool IsAlive();
 
         public void TakeDamage( int damage );
     }

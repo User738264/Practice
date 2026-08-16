@@ -4,7 +4,6 @@ namespace Fighters.Models.Weapons
     {
         public string Name { get; }
         public int Damage { get; }
-
         public double CritChance { get; }
     }
 }

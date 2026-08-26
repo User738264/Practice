@@ -1,9 +1,13 @@
 using Fighters.Models.Fighters;
+using Fighters.Randomization;
+using Fighters.UI;
 
 namespace Fighters
 {
     public class GameManager
     {
+        private const int MinFightersToStartBattle = 2;
+
         private const int MaxRounds = 1000;
 
         private const double MinDamageVariance = -0.20;
@@ -13,10 +17,33 @@ namespace Fighters
 
         private const int MinDamagePerHit = 1;
 
-        private readonly Random _random = new();
+        private readonly IRandomProvider _random;
+        private readonly IConsoleIO _io;
+
+        public GameManager() : this( new RandomProvider(), new ConsoleIO() )
+        {
+        }
+
+        public GameManager( IRandomProvider randomProvider ) : this( randomProvider, new ConsoleIO() )
+        {
+        }
+
+        public GameManager( IRandomProvider randomProvider, IConsoleIO io )
+        {
+            _random = randomProvider ?? throw new ArgumentNullException( nameof( randomProvider ) );
+            _io = io ?? throw new ArgumentNullException( nameof( io ) );
+        }
 
         public IFighter Play( IReadOnlyList<IFighter> fighters )
         {
+            ArgumentNullException.ThrowIfNull( fighters );
+
+            if ( fighters.Count < MinFightersToStartBattle )
+            {
+                throw new ArgumentException(
+                    $"Для проведения битвы нужно как минимум {MinFightersToStartBattle} бойца(ов)", nameof( fighters ) );
+            }
+
             List<IFighter> turnOrder = fighters.OrderByDescending( fighter => fighter.CalculateSpeed() ).ToList();
             PrintTurnOrder( turnOrder );
 
@@ -24,7 +51,7 @@ namespace Fighters
 
             while ( CountAlive( fighters ) > 1 && round <= MaxRounds )
             {
-                Console.WriteLine( $"Раунд {round}" );
+                _io.WriteLine( $"Раунд {round}" );
 
                 foreach ( IFighter attacker in turnOrder )
                 {
@@ -70,22 +97,22 @@ namespace Fighters
 
         private void PrintTurnOrder( List<IFighter> turnOrder )
         {
-            Console.WriteLine( "Порядок ходов (по инициативе):" );
+            _io.WriteLine( "Порядок ходов (по инициативе):" );
 
             foreach ( IFighter fighter in turnOrder )
             {
-                Console.WriteLine( $"  {fighter.Name} (скорость {fighter.CalculateSpeed()})" );
+                _io.WriteLine( $"  {fighter.Name} (скорость {fighter.CalculateSpeed()})" );
             }
         }
 
         private void PrintAttack( IFighter attacker, IFighter target, int damage, bool isCritical )
         {
             string critNote = isCritical ? " (критический удар!)" : string.Empty;
-            Console.WriteLine( $"{attacker.Name} атакует {target.Name} и наносит {damage} урона{critNote}" );
+            _io.WriteLine( $"{attacker.Name} атакует {target.Name} и наносит {damage} урона{critNote}" );
 
             if ( !target.IsAlive() )
             {
-                Console.WriteLine( $"{target.Name} погибает" );
+                _io.WriteLine( $"{target.Name} погибает" );
             }
         }
 
@@ -110,19 +137,19 @@ namespace Fighters
 
             if ( survivors.Count == 1 )
             {
-                Console.WriteLine( $"{survivors[ 0 ].Name} остается единственным на арене и побеждает!" );
+                _io.WriteLine( $"{survivors[ 0 ].Name} остается единственным на арене и побеждает!" );
                 return survivors[ 0 ];
             }
 
             if ( survivors.Count == 0 )
             {
-                Console.WriteLine( "Все бойцы пали одновременно — победитель определяется случайно" );
+                _io.WriteLine( "Все бойцы пали одновременно — победитель определяется случайно" );
                 return fighters[ _random.Next( fighters.Count ) ];
             }
 
-            Console.WriteLine( "Битва слишком затянулась — победитель определяется случайно" );
+            _io.WriteLine( "Битва слишком затянулась — победитель определяется случайно" );
             IFighter winner = survivors[ _random.Next( survivors.Count ) ];
-            Console.WriteLine( $"По воле случая побеждает {winner.Name}!" );
+            _io.WriteLine( $"По воле случая побеждает {winner.Name}!" );
             return winner;
         }
     }

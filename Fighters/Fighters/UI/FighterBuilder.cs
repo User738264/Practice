@@ -40,9 +40,20 @@ namespace Fighters.UI
             new PlateArmor(),
         };
 
+        private readonly IConsoleIO _io;
+
+        public FighterBuilder() : this( new ConsoleIO() )
+        {
+        }
+
+        public FighterBuilder( IConsoleIO io )
+        {
+            _io = io ?? throw new ArgumentNullException( nameof( io ) );
+        }
+
         public IFighter Build( IReadOnlyCollection<string> takenNames )
         {
-            Console.WriteLine( "Введите имя персонажа" );
+            _io.WriteLine( "Введите имя персонажа" );
             string name = ReadUniqueName( takenNames );
 
             IRace race = ChooseRace();
@@ -67,13 +78,13 @@ namespace Fighters.UI
                 available = PresetFighters.All;
             }
 
-            Console.WriteLine( "Выберите заготовленного персонажа из списка ниже" );
+            _io.WriteLine( "Выберите заготовленного персонажа из списка ниже" );
 
             IFighter[] previews = available.Select( preset => preset.Create() ).ToArray();
 
             for ( int i = 0; i < previews.Length; i++ )
             {
-                Console.WriteLine( $"{i} - {previews[ i ]}" );
+                _io.WriteLine( $"{i} - {previews[ i ]}" );
             }
 
             int choice = ReadChoice( 0, previews.Length - 1 );
@@ -86,12 +97,12 @@ namespace Fighters.UI
 
         private IRace ChooseRace()
         {
-            Console.WriteLine( "Выберите расу из списка ниже" );
+            _io.WriteLine( "Выберите расу из списка ниже" );
 
             for ( int i = 0; i < Races.Length; i++ )
             {
                 IRace race = Races[ i ];
-                Console.WriteLine(
+                _io.WriteLine(
                     $"{i} - {race.Name} (урон +{race.Damage}, здоровье +{race.Health}, броня +{race.Armor}, скорость +{race.Speed})" );
             }
 
@@ -101,12 +112,12 @@ namespace Fighters.UI
 
         private IFighterClass ChooseFighterClass()
         {
-            Console.WriteLine( "Выберите класс персонажа из списка ниже" );
+            _io.WriteLine( "Выберите класс персонажа из списка ниже" );
 
             for ( int i = 0; i < FighterClasses.Length; i++ )
             {
                 IFighterClass fighterClass = FighterClasses[ i ];
-                Console.WriteLine(
+                _io.WriteLine(
                     $"{i} - {fighterClass.Name} (доп. урон +{fighterClass.BonusDamage}, доп. здоровье +{fighterClass.BonusHealth})" );
             }
 
@@ -122,12 +133,12 @@ namespace Fighters.UI
 
         private IWeapon ChooseWeapon()
         {
-            Console.WriteLine( "Выберите оружие из списка ниже" );
+            _io.WriteLine( "Выберите оружие из списка ниже" );
 
             for ( int i = 0; i < Weapons.Length; i++ )
             {
                 IWeapon weapon = Weapons[ i ];
-                Console.WriteLine( $"{i} - {weapon.Name} (урон +{weapon.Damage}, шанс крита {weapon.CritChance} %)" );
+                _io.WriteLine( $"{i} - {weapon.Name} (урон +{weapon.Damage}, шанс крита {weapon.CritChance} %)" );
             }
 
             int choice = ReadChoice( 0, Weapons.Length - 1 );
@@ -136,12 +147,12 @@ namespace Fighters.UI
 
         private IArmor ChooseArmor()
         {
-            Console.WriteLine( "Выберите броню из списка ниже" );
+            _io.WriteLine( "Выберите броню из списка ниже" );
 
             for ( int i = 0; i < Armors.Length; i++ )
             {
                 IArmor armor = Armors[ i ];
-                Console.WriteLine( $"{i} - {armor.Name} (броня +{armor.Armor}, штраф к скорости -{armor.SpeedPenalty})" );
+                _io.WriteLine( $"{i} - {armor.Name} (броня +{armor.Armor}, штраф к скорости -{armor.SpeedPenalty})" );
             }
 
             int choice = ReadChoice( 0, Armors.Length - 1 );
@@ -150,13 +161,13 @@ namespace Fighters.UI
 
         private void PrintSummary( IFighter fighter )
         {
-            Console.WriteLine( "Боец добавлен! Итоговые характеристики:" );
-            Console.WriteLine( $"Имя: {fighter.Name}" );
-            Console.WriteLine( $"Здоровье: {fighter.GetMaxHealth()}" );
-            Console.WriteLine( $"Урон: {fighter.CalculateDamage()}" );
-            Console.WriteLine( $"Броня: {fighter.CalculateArmor()}" );
-            Console.WriteLine( $"Скорость: {fighter.CalculateSpeed()}" );
-            Console.WriteLine( $"Шанс критического удара: {fighter.GetCritChance()} %" );
+            _io.WriteLine( "Боец добавлен! Итоговые характеристики:" );
+            _io.WriteLine( $"Имя: {fighter.Name}" );
+            _io.WriteLine( $"Здоровье: {fighter.GetMaxHealth()}" );
+            _io.WriteLine( $"Урон: {fighter.CalculateDamage()}" );
+            _io.WriteLine( $"Броня: {fighter.CalculateArmor()}" );
+            _io.WriteLine( $"Скорость: {fighter.CalculateSpeed()}" );
+            _io.WriteLine( $"Шанс критического удара: {fighter.GetCritChance()} %" );
         }
 
         private string ReadUniqueName( IReadOnlyCollection<string> takenNames )
@@ -165,7 +176,7 @@ namespace Fighters.UI
 
             while ( takenNames.Contains( name ) )
             {
-                Console.WriteLine( "Боец с таким именем уже на арене, введите другое имя" );
+                _io.WriteLine( "Боец с таким именем уже на арене, введите другое имя" );
                 name = ReadNonEmptyLine();
             }
 
@@ -178,7 +189,7 @@ namespace Fighters.UI
 
             while ( string.IsNullOrWhiteSpace( input ) )
             {
-                Console.WriteLine( "Имя не может быть пустым, попробуйте снова" );
+                _io.WriteLine( "Имя не может быть пустым, попробуйте снова" );
                 input = ReadLineOrThrow();
             }
 
@@ -196,13 +207,13 @@ namespace Fighters.UI
                     return choice;
                 }
 
-                Console.WriteLine( $"Некорректный ввод, введите число от {min} до {max}" );
+                _io.WriteLine( $"Некорректный ввод, введите число от {min} до {max}" );
             }
         }
 
         private string ReadLineOrThrow()
         {
-            return Console.ReadLine() ?? throw new EndOfInputException();
+            return _io.ReadLine() ?? throw new EndOfInputException();
         }
     }
 }

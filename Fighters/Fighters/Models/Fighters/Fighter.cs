@@ -18,6 +18,16 @@ namespace Fighters.Models.Fighters
 
         public Fighter( string name, IRace race, IFighterClass fighterClass, IWeapon weapon, IArmor armor )
         {
+            if ( string.IsNullOrWhiteSpace( name ) )
+            {
+                throw new ArgumentException( "Имя бойца не может быть пустым", nameof( name ) );
+            }
+
+            ArgumentNullException.ThrowIfNull( race );
+            ArgumentNullException.ThrowIfNull( fighterClass );
+            ArgumentNullException.ThrowIfNull( weapon );
+            ArgumentNullException.ThrowIfNull( armor );
+
             Name = name;
             _race = race;
             _classDamage = fighterClass.BonusDamage;
@@ -37,6 +47,11 @@ namespace Fighters.Models.Fighters
 
         public void TakeDamage( int damage )
         {
+            if ( damage < 0 )
+            {
+                throw new ArgumentOutOfRangeException( nameof( damage ), damage, "Урон не может быть отрицательным" );
+            }
+
             int newHealth = _currentHealth - damage;
             if ( newHealth < 0 )
             {
